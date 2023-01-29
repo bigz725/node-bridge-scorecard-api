@@ -1,21 +1,17 @@
 const chai = require('chai');
 const expect = chai.expect
 const mongoose = require('mongoose')
+const dbHandler = require('../../helpers/in-memory-handler')
 const Board = require('../../../models/board')
 
 describe('Board', function() {
     describe('crud', function() {
-        before(function() {
-            mongoose.connect('mongodb://localhost/bridge_scorecard_api')
-            const db = mongoose.connection
-            db.on('error', console.error.bind(console, 'connection error'))
-            db.once('open', function() {
-                //console.log('connected to database')
-            })
-        })
-        afterEach(async function() {
-            await mongoose.connection.collections.boards.drop()
-        })
+        before(async () => await dbHandler.connect());
+
+        afterEach(async () => await dbHandler.clearDatabase());
+
+        after(async () => await dbHandler.closeDatabase());
+
         describe('create', function() {
             it('should save', async function() {
                 var board = new Board({boardNumber: 1})
