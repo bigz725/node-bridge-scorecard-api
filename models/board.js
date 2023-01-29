@@ -38,7 +38,16 @@ const BoardSchema = new Schema({
         validate: {
             validator: Number.isInteger
         }
-    }
+    },
+    createdAt: {
+        type: Date,
+        default: () => Date.now(),
+        immutable: true
+    },
+    updatedAt: {
+        type: Date,
+        default: () => Date.now()
+    },
 })
 BoardSchema.virtual('they').get(
     function() { return -this.we; }

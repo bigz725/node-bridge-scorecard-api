@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "mocha --recursive --exit --reporter dot --timeout 40000"
+    "test": "mocha --recursive --exit --reporter dot --timeout 5000"
   },
   "keywords": [],
   "author": "",

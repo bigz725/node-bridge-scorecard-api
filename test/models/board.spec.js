@@ -1,45 +1,43 @@
-var expect = require('chai').expect;
+const chai = require('chai');
+const expect = chai.expect
+const mongoose = require('mongoose')
+const Board = require('../../models/board')
 
-var Board = require('../../models/board')
 
 describe('board', function() {
     describe('validations', function() {
         describe('for boardNumber', function() {
-            it('should be invalid if board number is null', function(done) {
-                var b = new Board()
+            it('should be invalid if board number is null', function() {
+                var b = new Board({})
                 b.validate(function(err) {
-                    expect(err?.errors?.boardNumber, 'boardNumber is required').to.exist;
-                    done();
+                    expect(err?.errors?.boardNumber, 'boardNumber is required').to.exist
                 })
             })
 
-            it('should be invalid if the board number is less than 1', function(done) {
+            it('should be invalid if the board number is less than 1', function() {
                 var b = new Board({boardNumber: 0})
                 b.validate(function(err) {
                     expect(err?.errors?.boardNumber, 'boardNumber < 0 should be invalid').to.exist;
-                    done();
                 })
             })
 
-            it('should be invalid if the board number is greater than 36', function(done) {
+            it('should be invalid if the board number is greater than 36', function() {
                 var b = new Board({boardNumber: 37})
                 b.validate(function(err) {
                     expect(err?.errors?.boardNumber, 'boardNumber > 36 should be invalid').to.exist;
-                    done();
                 })
             })
 
-            it('should be invalid if the board number is not an integer', function(done) {
+            it('should be invalid if the board number is not an integer', function() {
                 var b = new Board({boardNumber: 5.3})
                 b.validate(function(err) {
                     expect(err?.errors?.boardNumber, '5.3 should not be a valid boardNumber').to.exist;
-                    done();
                 })
             })
         })
         describe('for contract', function() { //♣♦♥♠
 
-            it('allows correct board expressions', function(done) {
+            it('allows correct board expressions', function() {
                 let boardNumber = 1
                 levels = ['1', '2', '3', '4', '5', '6', '7']
                 suitSymbols = ['♣', '♦', '♥', '♠']
@@ -61,7 +59,6 @@ describe('board', function() {
                         })
                     })
                 })
-                done()
             })
         })
         describe('for we', function() {
@@ -193,5 +190,47 @@ describe('board', function() {
             })
         })
 
+    })
+
+    describe('crud', function() {
+        before(function() {
+            mongoose.connect('mongodb://localhost/bridge_scorecard_api')
+            const db = mongoose.connection
+            db.on('error', console.error.bind(console, 'connection error'))
+            db.once('open', function() {
+                //console.log('connected to database')
+            })
+        })
+        afterEach(async function() {
+            await mongoose.connection.collections.boards.drop()
+        })
+        describe('create', function() {
+            it('should save', async function() {
+                var board = new Board({boardNumber: 1})
+                await board.save()
+                expect(board.isNew).to.be.false
+            })
+        })
+        describe('update and delete', function() {
+            var board 
+            this.beforeEach(async function() {
+                board = new Board({boardNumber: 1})
+                await board.save()
+            })
+
+            it('should update', async function() {
+                board.contract = '3nn'
+                await board.save()
+                lookedUpBoard = await Board.findOne({ _id: board.id })
+                expect(lookedUpBoard.contract).to.eql('3nn')                
+            })
+
+            it('should delete', async function() {
+                await board.delete()
+                count = await Board.count()
+                expect(count).to.eq(0)
+            })
+
+        })
     })
 })
