@@ -5,8 +5,11 @@ mongoose.set('strictQuery', false)
 function dbconnect() {
     console.log("connecting to db")
     mongoose.connect(DB_uri, {useNewUrlParser: true})
-    console.log("connected")
-    return mongoose.connection
+        .then(() => {
+            console.log(`Mongoose: Successfully connected to ${mongoose.connection.name} on ${mongoose.connection.host}`)
+            return mongoose.connection
+        })
+        .catch((e) => console.log(`Error connecting: ${e}`))
 }
 
 function dbclose() {
