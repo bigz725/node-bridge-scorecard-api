@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect
 
-const Board = require('../../../models/board')
+const Board = require('../../../models/board').Board
 
 describe('board', function() {
     describe('virtuals', function() {

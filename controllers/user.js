@@ -3,14 +3,50 @@ exports.allAccess = (req, res) => {
     res.status(200).send("Public Content.");
   };
   
-  exports.userBoard = async (req, res) => {
-    console.log('in userboard controller')
-    const user = await User.findById(req.body['id'])
-    console.log(`user: ${user}`)
-    res.status(200).json(user)
+  exports.userBoard = (req, res) => {
+    const id = req.body['id'] || req.params['id']
+    User.findById(id)
+    .then((user) => {
+      if (user === null) {
+        res.status(404).send(`User ${id} not found`)
+        return
+      }
+      console.log(`user: ${user}`)
+      return res.status(200).json(user)
+    }).
+    catch((err) => {
+      console.log(`Error: ${err}`)
+      return res.status(500).send({error: 'Server error'})
+    })
   };
   
   exports.adminBoard = (req, res) => {
     res.status(200).send("Admin Content.");
   };
+
+  exports.patchUser = (req, res) => {
+    console.log(`patching user ${req.params.id}`)
+    User.findById(req.params.id)
+      .then((user) => {
+        if (user === null) {
+          res.status(404).send(`User ${req.params.id} not found`)
+          return
+        }
+        user.updateOne(req.body)
+          .then(() => {
+            res.status(200).send("Modified")
+            return
+          })
+          .catch((err) => {
+            console.log(err)
+            res.status(500).send(`Server error`)
+            return
+          })        
+
+      }).catch((err) => {
+        console.log(err)
+        res.status(500).send({error: 'Server error'})
+        return
+      })
+  }
   

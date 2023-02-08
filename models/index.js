@@ -7,7 +7,10 @@ db.mongoose = mongoose
 
 db.user = require('./user')
 db.role = require('./role')
-db.board = require('./board')
+db.boardSchema = require('./board').BoardSchema
+db.board = require('./board').Board
+db.sessionSchema  = require('./session').SessionSchema
+db.session = require('./session').Session
 Role=db.role
 
 db.ROLES = ["user", "admin"]

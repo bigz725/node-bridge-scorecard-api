@@ -1,11 +1,11 @@
 const mongoose = require("mongoose")
-const Board = require("./board")
+const BoardSchema = require("./board").BoardSchema
 const Schema = mongoose.Schema
 
 const SessionSchema = new Schema({
     name: String,
     location: String,
-    boards: [Board],
+    boards: [BoardSchema],
     createdAt: {
         type: Date,
         default: () => Date.now(),
@@ -16,3 +16,7 @@ const SessionSchema = new Schema({
         default: () => Date.now()
     },
 })
+const Session = mongoose.model('Session', SessionSchema)
+
+
+module.exports = { SessionSchema, Session}

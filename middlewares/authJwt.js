@@ -37,8 +37,8 @@ isAdmin = (req, res, next) => {
   
           for (let i = 0; i < roles.length; i++) {
             if (roles[i].name === "admin") {
-              next();
-              return;
+              req.isAdmin = true
+              return next();
             }
           }
   
@@ -48,11 +48,20 @@ isAdmin = (req, res, next) => {
       );
     });
   };
+
+  isSelfOrAdmin = (req, res, next) => {
+    if(req.body.id == req.userId || req.isAdmin) 
+    {
+      return next();
+    }
+    res.status(403).send({ message: "Can't edit other users"})
+  }
   
 
   const authJwt = {
     verifyToken,
     isAdmin,
+    isSelfOrAdmin,
   }
 
   module.exports = authJwt

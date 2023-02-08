@@ -39,6 +39,10 @@ const BoardSchema = new Schema({
             validator: Number.isInteger
         }
     },
+    session: {
+        type: Schema.Types.ObjectId,
+        ref: "Session"
+    },
     createdAt: {
         type: Date,
         default: () => Date.now(),
@@ -74,4 +78,4 @@ BoardSchema.virtual('redoubled').get(
     function() { return this.contract?.match(contractRegex)?.groups?.dblRdbl == 'xx' }
 )
 const Board = mongoose.model('Board', BoardSchema)
-module.exports = Board
+module.exports = {BoardSchema, Board}
