@@ -18,8 +18,7 @@ first-job:
 second-job:
   stage: run
   script:
-    - npm run start
-    - node test.js
+    - npm run test
   artifacts:
     paths:
       - node_modules/
