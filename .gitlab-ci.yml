@@ -4,6 +4,8 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  IMAGE: zkissane/bridge_scorecard_api:latest
+  CONTAINER: bridge_scorecard_api_ci_tests
 
 services:
 - name: docker:dind
@@ -24,15 +26,14 @@ first-job:
   stage: build
   # What to run on the job.
   script:
-    - docker build -t zkissane/bridge_scorecard_api:latest . 
+    - docker build -t $IMAGE . 
 
 second-job:
   stage: run
   script:
-    - npm run test
-  artifacts:
-    paths:
-      - node_modules/
+    - docker create $IMAGE -it --name $CONTAINER
+    - docker exec -it npm test
+    - docker stop $CONTAINER
 
 second-job-parallel:
   stage: run
