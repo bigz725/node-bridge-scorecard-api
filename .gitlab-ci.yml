@@ -24,10 +24,7 @@ first-job:
   stage: build
   # What to run on the job.
   script:
-    - npm install
-  artifacts:
-    paths:
-      - node_modules
+    - docker build -t zkissane/bridge_scorecard_api:latest . 
 
 second-job:
   stage: run
