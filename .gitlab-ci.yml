@@ -27,7 +27,7 @@ first-job:
   # What to run on the job.
   script:
     - docker build -t $IMAGE . 
-    - docker run $IMAGE --name $CONTAINER npm test
+    - docker run --name $CONTAINER $IMAGE npm test
 
 # second-job:
 #   stage: run
