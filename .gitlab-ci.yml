@@ -27,15 +27,11 @@ first-job:
   # What to run on the job.
   script:
     - docker build -t $IMAGE . 
+    - docker run $IMAGE --name $CONTAINER npm test
 
-second-job:
-  stage: run
-  script:
-    - docker create $IMAGE -it --name $CONTAINER
-    - docker exec -it npm test
-    - docker stop $CONTAINER
-
-second-job-parallel:
-  stage: run
-  script:
-    - echo "I'm running at the same time as second-job!!!"
+# second-job:
+#   stage: run
+#   script:
+#     - docker create $IMAGE -it --name $CONTAINER
+#     - docker exec -it npm test
+#     - docker stop $CONTAINER
