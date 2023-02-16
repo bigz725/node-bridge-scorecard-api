@@ -1,7 +1,7 @@
 {
   "name": "bridge_scorecard_api",
   "version": "0.1.0",
-  "description": "",
+  "description": "f",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
