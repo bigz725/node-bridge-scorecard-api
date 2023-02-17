@@ -6,28 +6,34 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   IMAGE: zkissane/bridge_scorecard_api:latest
   CONTAINER: bridge_scorecard_api_ci_tests
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
 
 services:
 - name: docker:dind
   command: ["--tls=false"]
 
+stages:
+  - build
+  - test
+  - release
+  - deploy
+
 
 before_script:
   - docker info
 
-  
-stages:
-  - build
-  - run
-
-# Job's name
-first-job:
-  # Define stage
+build:
   stage: build
-  # What to run on the job.
   script:
-    - docker build -t $IMAGE . 
-    - docker run --name $CONTAINER $IMAGE npm test
+    - docker build -t $CONTAINER_TEST_IMAGE .
+    - docker push $CONTAINER_TEST_IMAGE
+
+test:
+  stage: test
+  script:
+    - docker pull $CONTAINER_TEST_IMAGE
+    - docker run $CONTAINER_TEST_IMAGE npm test    
 
 # second-job:
 #   stage: run
