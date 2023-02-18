@@ -4,7 +4,7 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  IMAGE: zkissane/bridge_scorecard_api:latest
+  IMAGE: zkissane/bridge_scorecard_api
   CONTAINER: bridge_scorecard_api_ci_tests
   CONTAINER_TEST_IMAGE: $IMAGE:$CI_COMMIT_REF_SLUG
   CONTAINER_RELEASE_IMAGE: $IMAGE:latest
