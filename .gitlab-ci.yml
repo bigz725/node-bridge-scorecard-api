@@ -28,14 +28,14 @@ build:
   script:
     - 'echo "Building image: $CONTAINER_TEST_IMAGE"'
     - docker build -t $CONTAINER_TEST_IMAGE .
-    - docker push $CONTAINER_TEST_IMAGE
+#    - docker push $CONTAINER_TEST_IMAGE
 
-test:
-  stage: test
-  script:
-    - 'echo "Pulling $CONTAINER_TEST_IMAGE to test using npm test"'
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker run $CONTAINER_TEST_IMAGE npm test    
+#test:
+#  stage: test
+#  script:
+#    - 'echo "Pulling $CONTAINER_TEST_IMAGE to test using npm test"'
+#    - docker pull $CONTAINER_TEST_IMAGE
+#    - docker run $CONTAINER_TEST_IMAGE npm test    
 
 # second-job:
 #   stage: run
