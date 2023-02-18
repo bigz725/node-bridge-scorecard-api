@@ -6,8 +6,8 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   IMAGE: zkissane/bridge_scorecard_api:latest
   CONTAINER: bridge_scorecard_api_ci_tests
-  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  CONTAINER_TEST_IMAGE: $IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $IMAGE:latest
 
 services:
 - name: docker:dind
