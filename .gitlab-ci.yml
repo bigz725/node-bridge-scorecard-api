@@ -4,10 +4,11 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  IMAGE: zkissane/bridge_scorecard_api
-  CONTAINER: bridge_scorecard_api_ci_tests
-  CONTAINER_TEST_IMAGE: $IMAGE:$CI_COMMIT_REF_SLUG
-  CONTAINER_RELEASE_IMAGE: $IMAGE:latest
+  REGISTRY: https://registry.local.zkissane.com
+  IMAGE: zachistan/bridge_scorecard_api
+
+  CURRENT_TAG: $REGISTRY/$IMAGE:$CI_COMMIT_REF_SLUG
+  RELEASE_TAG: $REGISTRY/$IMAGE:latest
 
 services:
 - name: docker:dind
@@ -26,9 +27,9 @@ before_script:
 build:
   stage: build
   script:
-    - 'echo "Building image: $CONTAINER_TEST_IMAGE"'
-    - docker build -t $CONTAINER_TEST_IMAGE .
-#    - docker push $CONTAINER_TEST_IMAGE
+    - 'echo "Building image: $CURRENT_TAG"'
+    - docker build -t $CURRENT_TAG .
+    - docker push $CURRENT_TAG
 
 #test:
 #  stage: test
