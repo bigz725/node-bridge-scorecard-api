@@ -27,6 +27,8 @@ before_script:
 build:
   stage: build
   script:
+    - echo 'Running tests'
+    - npm test
     - 'echo "Building image: $CURRENT_TAG"'
     - docker build -t $CURRENT_TAG .
     - docker push $CURRENT_TAG
