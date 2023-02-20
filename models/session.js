@@ -6,16 +6,16 @@ const SessionSchema = new Schema({
     name: String,
     location: String,
     boards: [BoardSchema],
-    createdAt: {
+    date: {
         type: Date,
         default: () => Date.now(),
-        immutable: true
     },
-    updatedAt: {
-        type: Date,
-        default: () => Date.now()
-    },
-})
+    linkedSessions: [this]
+},
+{
+    timestamps: true
+}
+)
 const Session = mongoose.model('Session', SessionSchema)
 
 
