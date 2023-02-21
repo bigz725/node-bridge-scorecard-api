@@ -4,30 +4,41 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
-  IMAGE: zkissane/bridge_scorecard_api:latest
-  CONTAINER: bridge_scorecard_api_ci_tests
+  REGISTRY: registry.local.zkissane.com
+  IMAGE: zachistan/bridge_scorecard_api
+
+  CURRENT_TAG: $REGISTRY/$IMAGE:$CI_COMMIT_REF_SLUG
+  RELEASE_TAG: $REGISTRY/$IMAGE:latest
 
 services:
 - name: docker:dind
   command: ["--tls=false"]
 
+stages:
+  - build
+  - test
+  - release
+  - deploy
+
 
 before_script:
   - docker info
 
-  
-stages:
-  - build
-  - run
-
-# Job's name
-first-job:
-  # Define stage
+build:
   stage: build
-  # What to run on the job.
   script:
-    - docker build -t $IMAGE . 
-    - docker run --name $CONTAINER $IMAGE npm test
+    - 'echo "Building image: $CURRENT_TAG"'
+    - docker build -t $CURRENT_TAG .
+    - echo 'Running tests'
+    - docker run $CURRENT_TAG npm test
+    - docker push $CURRENT_TAG
+
+test:
+  stage: test
+  script:
+    - 'echo "Pulling $CURRENT_TAG to test using npm test"'
+    - docker pull $CURRENT_TAG
+    - docker run $CURRENT_TAG npm test    
 
 # second-job:
 #   stage: run
