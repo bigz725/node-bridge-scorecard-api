@@ -35,14 +35,14 @@ lookupCurrentUser = async (req, res, next) => {
 };
 
 lookupCurrentUsersRoles = async (req, res, next) =>{
-  currentUser = req.currentUser;
+  const currentUser = req.currentUser;
   try{
     req.currentUserRoles = await Role.find({ _id: { $in: currentUser.roles } });
     next();
   }
   catch(error) {
     console.log(`lookupCurrentUserRoles failed: ${error}`);
-    return res.status(403).send({message: "User requires authorization but doesn't have it"})
+    return res.status(403).send({error: "User requires authorization but doesn't have it"})
   }
 }
 
@@ -53,7 +53,7 @@ hasRole = (role) => {
     }
     else {
       console.log(`hasRole: User ${req.currentUserId} needs role ${role} but doesn't have it.`)
-      return res.status(403).send({message: 'Unauthorized'})
+      return res.status(403).send({error: 'Unauthorized'})
     }
   }
 }
@@ -63,7 +63,7 @@ isSelfOrAdmin = (req, res, next) => {
   {
     return next();
   }
-  res.status(403).send({ message: "Can't edit other users"})
+  res.status(403).send({ error: "Can't edit other users"})
 }
 
 const authJwt = {
