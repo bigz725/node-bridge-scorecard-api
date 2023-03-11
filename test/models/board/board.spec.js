@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect
 const mongoose = require('mongoose')
 const dbHandler = require('../../helpers/in-memory-handler')
-const Board = require('../../../models/board')
+const Board = require('../../../models/board').Board
 
 describe('Board', function() {
     describe('crud', function() {

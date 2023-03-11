@@ -1,3 +1,4 @@
+var repl = require("repl")
 const express = require('express')
 const app = new express()
 app.use(express.json())
@@ -12,10 +13,7 @@ app.use(cors(corsOptions))
 require('./helpers/mongoose-config').dbconnect()
 
 const db = require("./models")
-db.initial()
 
-app.listen(port, () => {
-    console.log(`App running in ${process.env.NODE_ENV}, listening on port ${port}` )
-})
-
-module.exports = app
+var replServer = repl.start({});
+replServer.context.db = db
+replServer.context.app = app
