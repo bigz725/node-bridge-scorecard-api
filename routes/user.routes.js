@@ -1,4 +1,4 @@
-const { authJwt } = require("../middlewares")
+const { authJwt, _, user } = require("../middlewares")
 const controller = require("../controllers/user")
 
 const fullSelfOrAdminStack = [
@@ -13,14 +13,12 @@ module.exports = function(app) {
         "x-access-token, Origin, Content-Type, Accept")
         next()
     })
-    app.get("/api/test/user", [authJwt.verifyToken, authJwt.lookupCurrentUser], controller.userBoard)
-    app.get("/api/test/user/:id", [authJwt.verifyToken, authJwt.lookupCurrentUser], controller.userBoard)
-    app.patch("/api/test/user/:id", fullSelfOrAdminStack, controller.patchUser)
+    app.get("/api/test/user", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.userBoard)
+    app.get("/api/test/user/:id", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.userBoard)
+    app.patch("/api/test/user/:id", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.patchUser)
 
-    app.post("/api/test/user/:id/sessions", fullSelfOrAdminStack, controller.newSession)
+    app.post("/api/test/user/:id/sessions", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.newSession)
     app.patch("/api/test/user/:id/sessions/:sessionId", fullSelfOrAdminStack, controller.patchSession)
-    app.delete("/api/test/user/:id/sessions/:sessionId", fullSelfOrAdminStack, controller.deleteSession)
-    app.get("/api/test/user/:id/sessions/:sessionId", fullSelfOrAdminStack, controller.session)
 
     app.get("/api/test/admin", [authJwt.verifyToken, authJwt.lookupCurrentUser, authJwt.lookupCurrentUsersRoles, authJwt.hasRole("admin")], controller.adminBoard)
 }

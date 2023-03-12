@@ -59,11 +59,12 @@ hasRole = (role) => {
 }
 
 isSelfOrAdmin = (req, res, next) => {
-  if(req.body.id == req.currentUserId || req.currentUserRoles?.find((element) => element.name === "admin") ) 
+  const targetUserId = req.params.id || req.body.id || req.query.id;
+  if(targetUserId == req.currentUserId || req.currentUserRoles?.find((element) => element.name === "admin") ) 
   {
     return next();
   }
-  res.status(403).send({ error: "Can't edit other users"})
+  return res.status(403).send({ error: "Can't access other users"})
 }
 
 const authJwt = {
