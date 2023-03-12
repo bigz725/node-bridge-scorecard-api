@@ -2,21 +2,9 @@ const User = require("../models/user");
 const Session = require("../models/session").Session;
 const ObjectId = require("mongoose").Types.ObjectId;
 
-exports.userBoard = (req, res) => {
-  const id = req.body["id"] || req.params["id"];
-  User.findById(id)
-    .then((user) => {
-      if (user === null) {
-        res.status(404).send({ error: `User ${id} not found` });
-        return;
-      }
-      console.log(`user: ${user}`);
-      return res.status(200).json(user);
-    })
-    .catch((err) => {
-      console.log(`Error: ${err}`);
-      return res.status(500).send({ error: "Server error" });
-    });
+exports.userBoard =  (req, res) => {
+  console.log(`user: ${req.targetUser.id}`)
+  return res.status(200).json(req.targetUser)
 };
 
 exports.adminBoard = (req, res) => {
@@ -24,15 +12,17 @@ exports.adminBoard = (req, res) => {
 };
 
 exports.newSession = async (req, res) => {
-  const user = await User.findById(req.params.id).orFail(() =>{
-    return res.status(404).send({message: "User not found", userId: req.params.id})
-  });
-  let session = new Session(req.body);
-  user.sessions.push(session);
-  await user.save();
-  return res.status(200).send({ message: "Created", id: session.id });
-
-
+  try{
+    user = req.targetUser
+    let session = new Session(req.body);
+    user.sessions.push(session);
+    await user.save();
+    return res.status(200).send({ message: "Created", id: session.id });
+  }
+  catch(err) {
+    console.log(`error: ${err}`)
+    return res.status(500).send({error: "Server error"})
+  }
 };
 
 exports.patchSession = async (req, res) => {  
@@ -48,29 +38,16 @@ exports.patchSession = async (req, res) => {
   }
 };
 
-exports.patchUser = (req, res) => {
+// remember, currentUser comes from the token.  The id parameter comes from the URL
+// and is the target object of the PATCH operation
+exports.patchUser = async (req, res) => {
   console.log(`patching user ${req.params.id}`);
-  User.findById(req.params.id)
-    .then((user) => {
-      if (user === null) {
-        res.status(404).send({ error: `User ${req.params.id} not found` });
-        return;
-      }
-      user
-        .updateOne(req.body)
-        .then(() => {
-          res.status(200).send({ message: "Modified" });
-          return;
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(500).send({ error: "Server error" });
-          return;
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send({ error: "Server error" });
-      return;
-    });
+  try{
+    await User.updateOne({_id: ObjectId(req.params.id)}, req.body)
+    res.status(200).send()
+  }
+  catch(error) {
+    console.log(error)
+    res.status(500).send({error: "Server error"})
+  }
 };
