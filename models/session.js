@@ -7,8 +7,9 @@ const SessionSchema = new Schema({
     location: String,
     boards: [BoardSchema],
     date: Date,
-    linkedSessions: [this]
-}
+    owner: { type: Schema.Types.ObjectId, ref: 'User'},
+    linkedSessions: [{ type: Schema.Types.ObjectId, ref: "Session" }]
+}, { timestamps: true }
 )
 const Session = mongoose.model('Session', SessionSchema)
 
