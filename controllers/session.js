@@ -1,6 +1,8 @@
+const { isNullOrUndefined } = require("mongoose/lib/utils");
 const { session } = require("../models");
 
 const Session = require("../models/session").Session;
+const Board = require("../models/board").Board
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const defaultPageSize = process.env.DEFAULT_PAGINATION_SIZE || 10
@@ -18,7 +20,7 @@ exports.getSessions = async(req, res) => {
 };
 
 exports.createSession = async(req, res) => {
-    console.log(`creating session for user: ${req.currentUser._id}`)
+    console.log(`creating session for user: ${req.currentUser._id}`);
     try{
         let input = {...{owner: req.currentUser._id}, ...req.body };
         const sess = await Session.create( input );
@@ -51,11 +53,45 @@ exports.patchSession = async (req, res) => {
 
 exports.deleteSession = async(req, res) => {
     try{
-        await Session.deleteOne({ _id: req.params.id, owner: req.currentUser._id})
-        res.status(200).send({message: "DELETED!"}) //come back Ali! come back Ali's sister!
+        await Session.deleteOne({ _id: req.params.id, owner: req.currentUser._id});
+        return res.status(200).send({message: "DELETED!"}); //come back Ali! come back Ali's sister!
     }
     catch(err) {
-        console.log(`Error in deleteSession: ${err}`)
-        res.status(500).send({message: "Flagrant error", title: "Everything is fine, nothing is ruined", headline: "This is real" })
+        console.log(`Error in deleteSession: ${err}`);
+        return res.status(500).send({message: "Flagrant error", title: "Everything is fine, nothing is ruined", headline: "This is real" });
+    }
+}
+
+exports.addBoard = async(req, res) => {
+    try{
+        let newBoard = new Board(req.body);
+        req.targetSession.boards.push(newBoard);
+        req.targetSession.save();
+        return res.status(200).send({message: "Created", id: newBoard._id});
+    }
+    catch(err) {
+        console.log(`Error in addBoard: ${err}`);
+        return res.status(500).send({message: "Server error"});
+    }
+}
+
+exports.patchBoard = async(req, res) => {
+    let targetSession = req.targetSession
+    try{
+        let targetBoard = await targetSession.boards.id(req.params.boardId);
+        if (targetBoard === null) {
+            return res.status(404).send({message: "Board not found"})
+        }
+        targetSession.markModified('boards')
+        for(const [key, value] of Object.entries(req.body)) {
+            targetBoard[key] = value
+        }
+        await targetSession.save()
+
+        return res.status(200).send({message: "modified"})
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).send({message: "server error"})
     }
 }
