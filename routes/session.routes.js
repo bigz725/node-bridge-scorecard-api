@@ -15,4 +15,6 @@ module.exports = function(app) {
     app.post("/api/test/sessions", [verifyToken, lookupCurrentUser], controller.createSession)
     app.patch("/api/test/sessions/:id", [verifyToken, lookupCurrentUser, lookupTargetSession], controller.patchSession)
     app.delete("/api/test/sessions/:id", [verifyToken, lookupCurrentUser], controller.deleteSession)
+    app.post("/api/test/sessions/:id/boards", [verifyToken, lookupCurrentUser, lookupTargetSession], controller.addBoard)
+    app.patch("/api/test/sessions/:id/boards/:boardId", [verifyToken, lookupCurrentUser, lookupTargetSession], controller.patchBoard)
 }

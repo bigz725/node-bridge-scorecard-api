@@ -42,16 +42,7 @@ const BoardSchema = new Schema({
     session: {
         type: Schema.Types.ObjectId,
         ref: "Session"
-    },
-    createdAt: {
-        type: Date,
-        default: () => Date.now(),
-        immutable: true
-    },
-    updatedAt: {
-        type: Date,
-        default: () => Date.now()
-    },
+    }
 })
 BoardSchema.virtual('they').get(
     function() { return -this.we; }

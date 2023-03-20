@@ -4,7 +4,8 @@ exports.lookupTargetSession = async (req, res, next) => {
     const sessionId = req.params.id || req.body.id || req.query.id
     const currentUserId = req.currentUser._id
     try{
-        req.targetSession = await Session.find({_id: sessionId, owner: currentUserId}).orFail();
+        result = await Session.find({_id: sessionId, owner: currentUserId}).orFail();
+        req.targetSession = result[0];
         next();
     }
     catch(err) {
