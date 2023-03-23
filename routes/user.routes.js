@@ -13,12 +13,12 @@ module.exports = function(app) {
         "x-access-token, Origin, Content-Type, Accept")
         next()
     })
-    app.get("/api/test/user", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.userBoard)
-    app.get("/api/test/user/:id", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.userBoard)
-    app.patch("/api/test/user/:id", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.patchUser)
+    app.get("/api/user", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.userBoard)
+    app.get("/api/user/:id", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.userBoard)
+    app.patch("/api/user/:id", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.patchUser)
 
-    app.post("/api/test/user/:id/sessions", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.newSession)
-    app.patch("/api/test/user/:id/sessions/:sessionId", fullSelfOrAdminStack, controller.patchSession)
+    app.post("/api/user/:id/sessions", [fullSelfOrAdminStack, user.lookupTargetUser].flat(), controller.newSession)
+    app.patch("/api/user/:id/sessions/:sessionId", fullSelfOrAdminStack, controller.patchSession)
 
-    app.get("/api/test/admin", [authJwt.verifyToken, authJwt.lookupCurrentUser, authJwt.lookupCurrentUsersRoles, authJwt.hasRole("admin")], controller.adminBoard)
+    app.get("/api/admin", [authJwt.verifyToken, authJwt.lookupCurrentUser, authJwt.lookupCurrentUsersRoles, authJwt.hasRole("admin")], controller.adminBoard)
 }
