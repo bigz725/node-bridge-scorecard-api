@@ -8,10 +8,10 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const defaultPageSize = process.env.DEFAULT_PAGINATION_SIZE || 10
 
 exports.getSessions = async(req, res) => {
-  console.log(`user: ${req.currentUser._id}`);
+  console.log(`Getting session summaries for user: ${req.currentUser.username}`);
   const page = req.query.page || 0 ;
   const pageSize = req.query.pageSize || defaultPageSize ;
-  sessions = await Session.find(
+  let sessions = await Session.find(
     {owner: req.currentUser.id},
     'name location date', 
     {skip: page * pageSize, sort: { "date": -1 }}
@@ -20,7 +20,7 @@ exports.getSessions = async(req, res) => {
 };
 
 exports.createSession = async(req, res) => {
-    console.log(`creating session for user: ${req.currentUser._id}`);
+    console.log(`creating session for user: ${req.currentUser.username}`);
     try{
         let input = {...{owner: req.currentUser._id}, ...req.body };
         const sess = await Session.create( input );

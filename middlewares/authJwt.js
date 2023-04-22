@@ -11,11 +11,13 @@ verifyToken = (req, res, next) => {
     req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
+    console.log(`No token provided on a route that requires auth: ${req.url}`)
     return res.status(403).send({ message: "No token provided" });
   }
 
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
+      console.log(`Error verifying token to access route: ${req.url}`)
       return res.status(401).send({ message: "Unauthorized" });
     }
     req.currentUserId = decoded.id;
@@ -29,7 +31,7 @@ lookupCurrentUser = async (req, res, next) => {
     req.currentUser = userFromToken;
     next();
   } catch (error) {
-    console.log(`User lookup failed: ${error}`);
+    console.log(`User id ${req.currentUserId} lookup failed: ${error}`);
     return res.status(404).send({ message: "Lookup failed." });
   }
 };
