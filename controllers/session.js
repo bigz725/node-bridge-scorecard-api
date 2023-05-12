@@ -43,7 +43,7 @@ exports.patchSession = async (req, res) => {
     try{
         await Session.findOneAndUpdate({_id: req.params.id, owner: req.currentUser._id},
         req.body).orFail();
-        return res.status(200).send({message: 'Session updated'})
+        return res.status(200).send({message: 'Session updated', id: req.params.id})
     } catch(err) {
         console.log(`Error in patchSession: ${err}`);
         return res.status(500).send({message: 'Server error'})
@@ -88,7 +88,7 @@ exports.patchBoard = async(req, res) => {
         }
         await targetSession.save()
 
-        return res.status(200).send({message: "modified"})
+        return res.status(200).send({message: "modified", id: targetBoard._id})
     }
     catch(err) {
         console.log(err)
