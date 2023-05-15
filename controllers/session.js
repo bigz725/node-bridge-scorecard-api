@@ -13,7 +13,7 @@ exports.getSessions = async(req, res) => {
   const pageSize = req.query.pageSize || defaultPageSize ;
   let sessions = await Session.find(
     {owner: req.currentUser.id},
-    'name location date', 
+    'name location date scoringType', 
     {skip: page * pageSize, sort: { "date": -1 }}
   );
   return res.status(200).json(sessions);
