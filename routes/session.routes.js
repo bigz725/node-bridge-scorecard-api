@@ -11,7 +11,7 @@ const fullSelfOrAdminStack = [
 
 module.exports = function(app) {
     app.get("/api/sessions", [verifyToken, lookupCurrentUser], controller.getSessions)
-    app.get("/api/sessions/:id", [verifyToken, lookupCurrentUser, lookupTargetSession], controller.getSession)
+    app.get("/api/sessions/:id", [verifyToken, lookupCurrentUser], controller.getSession)
     app.post("/api/sessions", [verifyToken, lookupCurrentUser], controller.createSession)
     app.patch("/api/sessions/:id", [verifyToken, lookupCurrentUser, lookupTargetSession], controller.patchSession)
     app.delete("/api/sessions/:id", [verifyToken, lookupCurrentUser], controller.deleteSession)
