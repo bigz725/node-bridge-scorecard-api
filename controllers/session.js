@@ -35,8 +35,40 @@ exports.createSession = async(req, res) => {
 
 };
 
-exports.getSession = (req, res) => {
-    res.status(200).json(req.targetSession)
+exports.getSession = async (req, res) => {
+
+    const sessionId = req.params.id || req.body.id || req.query.id;
+    const currentUserId = req.currentUser._id;
+    const agg = [
+        {
+          $match:
+            {
+              _id: new ObjectId(sessionId),
+              owner: new ObjectId(currentUserId),
+            },
+        },
+        {
+          $set:
+            {
+              boards: {
+                $function: {
+                  body: function (boards) {
+                    boards.sort(
+                      (a, b) =>
+                        a.boardNumber - b.boardNumber
+                    );
+                    return boards;
+                  },
+                  args: ["$boards"],
+                  lang: "js",
+                },
+              },
+            },
+        },
+    ]
+    result = await Session.aggregate(agg)
+
+    res.status(200).json(result)
 }
 
 exports.patchSession = async (req, res) => {
