@@ -36,15 +36,21 @@ exports.createSession = async(req, res) => {
 };
 
 exports.getSession = async (req, res) => {
-
-    const sessionId = req.params.id || req.body.id || req.query.id;
-    const currentUserId = req.currentUser._id;
+    var sessObjId, userObjId
+    try{
+        sessObjId = new ObjectId(req.params.id || req.body.id || req.query.id)
+        userObjId = new ObjectId(req.currentUser._id)
+    }
+    catch(e) {
+        res.status(400).send({message: "Bad request parameters"})
+        return
+    }
     const agg = [
         {
           $match:
             {
-              _id: new ObjectId(sessionId),
-              owner: new ObjectId(currentUserId),
+              _id: sessObjId,
+              owner: userObjId,
             },
         },
         {
@@ -67,8 +73,12 @@ exports.getSession = async (req, res) => {
         },
     ]
     result = await Session.aggregate(agg)
+    if (result == null || result.length != 1) {
+        res.status(404).send({message: "Session not found"})
+        return
+    }
 
-    res.status(200).json(result)
+    res.status(200).json(result[0])
 }
 
 exports.patchSession = async (req, res) => {
