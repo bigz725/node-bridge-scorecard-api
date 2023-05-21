@@ -110,7 +110,7 @@ exports.addBoard = async(req, res) => {
     try{
         let newBoard = new Board(req.body);
         req.targetSession.boards.push(newBoard);
-        req.targetSession.save();
+        await req.targetSession.save();
         return res.status(200).send({message: "Created", id: newBoard._id});
     }
     catch(err) {
