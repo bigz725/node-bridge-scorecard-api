@@ -6,8 +6,10 @@ const Role = db.role;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
 
+const logger = require('../logger').textLogger
+
 exports.signup = (req, res) => {
-  console.log('in signup')
+  logger.debug('in signup')
   const user = new User({
     username: req.body.username,
     email: req.body.email,
@@ -99,7 +101,7 @@ exports.signin = (req, res) => {
       for (let i = 0; i < user.roles.length; i++) {
         authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
       }
-      console.log(`User: ${user.username} successfully logged in.`)
+      logger.info(`User: ${user.username} successfully logged in.`)
       res.status(200).send({
         id: user._id,
         username: user.username,

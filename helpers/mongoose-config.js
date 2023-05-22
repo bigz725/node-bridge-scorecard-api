@@ -1,28 +1,23 @@
 const mongoose = require('mongoose')
 const DB_uri = process.env.MONGO_URL
 mongoose.set('strictQuery', false)
+const logger = require('../logger').textLogger
 
 function dbconnect() {
-    console.log("connecting to db")
+    logger.info("connecting to db")
     mongoose.connect(DB_uri, {useNewUrlParser: true})
         .then(() => {
-            console.log(`Mongoose: Successfully connected to ${mongoose.connection.name} on ${mongoose.connection.host}`)
+            logger.info(`Mongoose: Successfully connected to ${mongoose.connection.name} on ${mongoose.connection.host}`)
             return mongoose.connection
         })
-        .catch((e) => console.log(`Error connecting: ${e}`))
+        .catch((e) => logger.error(`Error connecting: ${e}`))
 }
 
 function dbclose() {
+    logger.info("Closing Mongoose connection")
     return mongoose.disconnect()
 }
 
 module.exports = {dbconnect, dbclose}
-// Mongoose.connect(process.env.MONGO_URL,{useNewUrlParser: true}).
-//     then(() => {
-//         console.log("Connected to database")
-//         module.exports = Mongoose
-//     }).catch((err) => {
-//         console.error("Not connected to database: ", err)
-//     }
-//     ); 
+
 

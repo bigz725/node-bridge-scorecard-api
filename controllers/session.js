@@ -7,8 +7,10 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const defaultPageSize = process.env.DEFAULT_PAGINATION_SIZE || 10
 
+const logger = require('../logger').textLogger
+
 exports.getSessions = async(req, res) => {
-  console.log(`Getting session summaries for user: ${req.currentUser.username}`);
+  logger.info(`Getting session summaries for user: ${req.currentUser.username}`);
   const page = req.query.page || 0 ;
   const pageSize = req.query.pageSize || defaultPageSize ;
   let sessions = await Session.find(
@@ -20,7 +22,7 @@ exports.getSessions = async(req, res) => {
 };
 
 exports.createSession = async(req, res) => {
-    console.log(`creating session for user: ${req.currentUser.username}`);
+    logger.info(`creating session for user: ${req.currentUser.username}`);
     try{
         let input = {...{owner: req.currentUser._id}, ...req.body };
         const sess = await Session.create( input );
@@ -29,7 +31,7 @@ exports.createSession = async(req, res) => {
         return res.status(200).send({message: "Created", id: sess.id});
     }
     catch(err) {
-        console.log(`error in createSession: ${err}`);
+        logger.error(`error in createSession: ${err}`);
         return res.status(500).send({message: "Server error"});
     }
 
@@ -89,7 +91,7 @@ exports.patchSession = async (req, res) => {
         ).orFail();
         return res.status(200).send({message: 'Session updated', id: req.params.id})
     } catch(err) {
-        console.log(`Error in patchSession: ${err}`);
+        logger.error(`Error in patchSession: ${err}`);
         return res.status(500).send({message: 'Server error'})
     }
 
@@ -101,7 +103,7 @@ exports.deleteSession = async(req, res) => {
         return res.status(200).send({message: "DELETED!"}); //come back Ali! come back Ali's sister!
     }
     catch(err) {
-        console.log(`Error in deleteSession: ${err}`);
+        logger.error(`Error in deleteSession: ${err}`);
         return res.status(500).send({message: "Flagrant error", title: "Everything is fine, nothing is ruined", headline: "This is real" });
     }
 }
@@ -114,7 +116,7 @@ exports.addBoard = async(req, res) => {
         return res.status(200).send({message: "Created", id: newBoard._id});
     }
     catch(err) {
-        console.log(`Error in addBoard: ${err}`);
+        logger.error(`Error in addBoard: ${err}`);
         return res.status(500).send({message: "Server error"});
     }
 }
@@ -135,7 +137,7 @@ exports.patchBoard = async(req, res) => {
         return res.status(200).send({message: "modified", id: targetBoard._id})
     }
     catch(err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).send({message: "server error"})
     }
 }

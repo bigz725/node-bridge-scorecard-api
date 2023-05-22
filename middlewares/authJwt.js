@@ -4,6 +4,7 @@ const { user } = require("../models");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+const logger = require('../logger').textLogger
 
 verifyToken = (req, res, next) => {
   let token =
@@ -11,13 +12,13 @@ verifyToken = (req, res, next) => {
     req.headers["authorization"]?.split(" ")[1];
 
   if (!token) {
-    console.log(`No token provided on a route that requires auth: ${req.url}`)
+    logger.warn(`No token provided on a route that requires auth: ${req.url}`)
     return res.status(403).send({ message: "No token provided" });
   }
 
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
-      console.log(`Error verifying token to access route: ${req.url}`)
+      logger.warn(`Error verifying token to access route: ${req.url}`)
       return res.status(401).send({ message: "Unauthorized" });
     }
     req.currentUserId = decoded.id;
@@ -31,7 +32,7 @@ lookupCurrentUser = async (req, res, next) => {
     req.currentUser = userFromToken;
     next();
   } catch (error) {
-    console.log(`User id ${req.currentUserId} lookup failed: ${error}`);
+    logger.warn(`User id ${req.currentUserId} lookup failed: ${error}`);
     return res.status(404).send({ message: "Lookup failed." });
   }
 };
@@ -43,7 +44,7 @@ lookupCurrentUsersRoles = async (req, res, next) =>{
     next();
   }
   catch(error) {
-    console.log(`lookupCurrentUserRoles failed: ${error}`);
+    logger.warn(`lookupCurrentUserRoles failed: ${error}`);
     return res.status(403).send({error: "User requires authorization but doesn't have it"})
   }
 }
@@ -54,7 +55,7 @@ hasRole = (role) => {
       next();
     }
     else {
-      console.log(`hasRole: User ${req.currentUserId} needs role ${role} but doesn't have it.`)
+      logger.warn(`hasRole: User ${req.currentUserId} needs role ${role} but doesn't have it.`)
       return res.status(403).send({error: 'Unauthorized'})
     }
   }
