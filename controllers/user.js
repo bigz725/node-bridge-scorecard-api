@@ -1,9 +1,10 @@
 const User = require("../models/user");
 const Session = require("../models/session").Session;
 const ObjectId = require("mongoose").Types.ObjectId;
+const logger = require('../logger').textLogger
 
 exports.userBoard =  (req, res) => {
-  console.log(`user: ${req.targetUser.id}`)
+  logger.info(`user: ${req.targetUser.id}`)
   return res.status(200).json(req.targetUser)
 };
 
@@ -20,7 +21,7 @@ exports.newSession = async (req, res) => {
     return res.status(200).send({ message: "Created", id: session.id });
   }
   catch(err) {
-    console.log(`error: ${err}`)
+    logger.error(`error: ${err}`)
     return res.status(500).send({error: "Server error"})
   }
 };
@@ -33,7 +34,7 @@ exports.patchSession = async (req, res) => {
     res.status(200).send()      
     }
    catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(500).send({ error: "Server error" });
   }
 };
@@ -41,13 +42,13 @@ exports.patchSession = async (req, res) => {
 // remember, currentUser comes from the token.  The id parameter comes from the URL
 // and is the target object of the PATCH operation
 exports.patchUser = async (req, res) => {
-  console.log(`patching user ${req.params.id}`);
+  logger.info(`patching user ${req.params.id}`);
   try{
     await User.updateOne({_id: ObjectId(req.params.id)}, req.body)
     res.status(200).send()
   }
   catch(error) {
-    console.log(error)
+    logger.error(error)
     res.status(500).send({error: "Server error"})
   }
 };

@@ -4,3 +4,6 @@ Dockerfile
 .gitignore
 .git
 .vscode
+*.log
+logs
+exampleFiles

@@ -11,7 +11,6 @@ module.exports = function(app) {
     app.post(
         "/api/auth/signup",
         [
-            (req, res, next) => {console.log("signup route"); next()},
             verifySignUp.checkDuplicateUsernameOrEmail,
             verifySignUp.checkRolesExisted,
         ],

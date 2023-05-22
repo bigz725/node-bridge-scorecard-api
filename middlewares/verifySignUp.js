@@ -1,20 +1,21 @@
 const db = require("../models")
 const ROLES = db.ROLES
 const User = db.user
+const logger = require('../logger').textLogger
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
-    console.log('in verifysignup, checkDuplicateUsernameOrEmail')
+    logger.debug('in checkDuplicateUsernameOrEmail')
     User.findOne({ $or: [ { username: req.body.username }, { email: req.body.email }]}).
         then((result) => {
-            if (result == null) { console.log('result empty'); next(); return }
+            if (result == null) { logger.info('result empty'); next(); return }
             var message = "something exists"
             if (result.username === req.body.username) { message = "Failed, username exists"}
             else if (result.email === req.body.email) { message = "Failed, email exists"}
-            console.log('sending 400 from checkDuplicateUsernameOrEmail')
+            logger.warn(`${message}`)
             res.status(400).send({message: message})
             return
         }).catch((err) => {
-            console.log(`error in checkDuplicateUsernameOrEmail: ${err}`)
+            logger.error(`error in checkDuplicateUsernameOrEmail: ${err}`)
             res.status(500).send({message: err})
             return
         })
