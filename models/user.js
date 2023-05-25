@@ -2,9 +2,19 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
-    username: String,
-    email: String,
+    username: {
+        type: String,
+        index: true
+    },
+    email: {
+        type: String,
+        index: true
+    },
     password: String,
+    salt: {
+        type: String,
+        index: true
+    },
     sessions: [{ type: Schema.Types.ObjectId, ref: 'Session' }],
     roles: [
         {
