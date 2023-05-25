@@ -5,6 +5,7 @@ const db = require("../models");
 const User = db.user;
 const Role = db.role;
 const logger = require('../logger').textLogger
+const ObjectId = require("mongoose").Types.ObjectId;
 
 verifyToken = (req, res, next) => {
   let token =
@@ -22,13 +23,23 @@ verifyToken = (req, res, next) => {
       return res.status(401).send({ message: "Unauthorized" });
     }
     req.currentUserId = decoded.id;
+    req.salt = decoded.salt
     next();
   });
 };
 
 lookupCurrentUser = async (req, res, next) => {
+  var lookupParams
+  let objId = new ObjectId(req.currentUserId)
+  if (req.salt){
+    lookupParams = {_id: objId, salt: req.salt}
+  }
+  else {
+    logger.warn(`Received a token for ${req.currentUserId} without a salt`)
+    lookupParams = {id: objId}
+  }
   try {
-    let userFromToken = await User.findById(req.currentUserId).orFail();
+    let userFromToken = await User.findOne(lookupParams).orFail();
     req.currentUser = userFromToken;
     next();
   } catch (error) {

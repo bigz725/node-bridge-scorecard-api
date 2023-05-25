@@ -2,3 +2,5 @@ NODE_ENV=development
 PORT=62220
 MONGO_URL=mongodb://localhost/bridge_scorecard_api
 DEFAULT_PAGINATION_SIZE=10
+SALT_BYTE_LENGTH=48
+SECRET=lskdjflskdjflkwjsfiwjef

@@ -7,11 +7,20 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     logger.debug('in checkDuplicateUsernameOrEmail')
     User.findOne({ $or: [ { username: req.body.username }, { email: req.body.email }]}).
         then((result) => {
-            if (result == null) { logger.info('result empty'); next(); return }
+            if (result == null) { 
+                logger.info(`Username ${req.body.username} and email ${req.body.email} are unique`); 
+                next(); 
+                return; 
+            }
             var message = "something exists"
-            if (result.username === req.body.username) { message = "Failed, username exists"}
-            else if (result.email === req.body.email) { message = "Failed, email exists"}
-            logger.warn(`${message}`)
+            if (result.username === req.body.username) {
+                logger.warn(`Username ${req.body.username} exists`) 
+                message = "Failed, username exists"
+            }
+            else if (result.email === req.body.email) {
+                logger.warn(`Email ${req.body.email} exists`) 
+                message = "Failed, email exists"
+            }
             res.status(400).send({message: message})
             return
         }).catch((err) => {
