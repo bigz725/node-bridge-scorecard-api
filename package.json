@@ -23,7 +23,8 @@
     "mongoose": "^6.8.4",
     "nodemon": "^2.0.20",
     "validator": "^13.7.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "chai": "^4.3.7",

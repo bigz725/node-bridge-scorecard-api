@@ -1,5 +1,5 @@
 var winston = require('winston'), expressWinston = require('express-winston')
-
+require('winston-daily-rotate-file')
 const { createLogger, format, transports } = winston
 const { combine, timestamp, label, colorize, printf, splat } = format
 
@@ -25,6 +25,19 @@ var consoleRequestLogger = expressWinston.logger({
     ]
 })
 
+const fileRotateTransport = new winston.transports.DailyRotateFile({
+    filename: 'logs/combined-%DATE%.log',
+    datePattern: 'YYYY-MM-DD',
+    maxFiles: '14d'
+})
+
+const errorRotateTransport = new winston.transports.DailyRotateFile({
+    filename: 'logs/error-%DATE%.log',
+    datePattern: 'YYYY-MM-DD',
+    maxFiles: '14d',
+    level: 'error'
+})
+
 var textLogger = winston.createLogger({
     level: 'info',
     format: combine(
@@ -37,7 +50,8 @@ var textLogger = winston.createLogger({
     ),
     defaultMeta: { service: 'user-service'},
     transports: [
-        new transports.File({filename: 'log.log'}),
+        fileRotateTransport,
+        errorRotateTransport,
         new transports.Console()
     ]
 
