@@ -19,7 +19,7 @@ var consoleRequestLogger = expressWinston.logger({
         myFormat
     ),
     statusLevels: true,
-    msg: "HTTP {{req.methopd}} {{req.url}}",
+    msg: "HTTP {{req.method}} {{req.url}}",
     transports: [
         new transports.Console()
     ]
