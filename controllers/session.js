@@ -1,5 +1,6 @@
 const { isNullOrUndefined } = require("mongoose/lib/utils");
 const { session } = require("../models");
+const { ValidationError } = require("mongoose/lib/document");
 
 const Session = require("../models/session").Session;
 const Board = require("../models/board").Board
@@ -31,8 +32,14 @@ exports.createSession = async(req, res) => {
         return res.status(200).send({message: "Created", id: sess.id});
     }
     catch(err) {
-        logger.error(`error in createSession: ${err}`);
-        return res.status(500).send({message: "Server error"});
+        if (err instanceof ValidationError) {
+            logger.warn(`Validation error: ${err}`)
+            return res.status(422).send({message: "validation error"})
+        }
+        else{
+            logger.error(`Error in addBoard: ${err}`);
+            return res.status(500).send({message: "Server error"});
+        }
     }
 
 };
@@ -90,9 +97,16 @@ exports.patchSession = async (req, res) => {
             { $set: req.body }
         ).orFail();
         return res.status(200).send({message: 'Session updated', id: req.params.id})
-    } catch(err) {
-        logger.error(`Error in patchSession: ${err}`);
-        return res.status(500).send({message: 'Server error'})
+    } 
+    catch(err) {
+        if (err instanceof ValidationError) {
+            logger.warn(`Validation error: ${err}`)
+            return res.status(422).send({message: "validation error"})
+        }
+        else{
+            logger.error(`Error in addBoard: ${err}`);
+            return res.status(500).send({message: "Server error"});
+        }
     }
 
 }
@@ -116,8 +130,14 @@ exports.addBoard = async(req, res) => {
         return res.status(200).send({message: "Created", id: newBoard._id});
     }
     catch(err) {
-        logger.error(`Error in addBoard: ${err}`);
-        return res.status(500).send({message: "Server error"});
+        if (err instanceof ValidationError) {
+            logger.warn(`Validation error: ${err}`)
+            return res.status(422).send({message: "validation error"})
+        }
+        else{
+            logger.error(`Error in addBoard: ${err}`);
+            return res.status(500).send({message: "Server error"});
+        }
     }
 }
 
@@ -137,7 +157,13 @@ exports.patchBoard = async(req, res) => {
         return res.status(200).send({message: "modified", id: targetBoard._id})
     }
     catch(err) {
-        logger.error(err)
-        res.status(500).send({message: "server error"})
+        if (err instanceof ValidationError) {
+            logger.warn(`Validation error: ${err}`)
+            return res.status(422).send({message: "validation error"})
+        }
+        else{
+            logger.error(`Error in addBoard: ${err}`);
+            return res.status(500).send({message: "Server error"});
+        }
     }
 }
