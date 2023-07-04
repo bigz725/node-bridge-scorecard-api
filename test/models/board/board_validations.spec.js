@@ -39,7 +39,7 @@ describe('board', function() {
             it('allows correct board expressions', function() {
                 let boardNumber = 1
                 levels = ['1', '2', '3', '4', '5', '6', '7']
-                suitSymbols = ['♣', '♦', '♥', '♠']
+                suitSymbols = ['♣️', '♦️', '♥️', '♠️']
                 strainLetters = ['c', 'd', 'h', 's', 'n', 'nt']
                 strains = [...suitSymbols, ...strainLetters]
                 doubledRedoubled = ['', 'x', 'xx']
