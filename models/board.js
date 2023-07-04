@@ -2,7 +2,8 @@ const mongoose = require("mongoose")
 
 const Schema = mongoose.Schema
 
-const contractRegex = /^(?<level>[1-7])(?<strain>[cdhs♣♦♥♠♣️♥️♦️♠️]|nt|n)(?<dblRdbl>x{0,2})\s*(?<declarer>[nsew])/i 
+
+const contractRegex = /^(?<level>[1-7])(?<strain>♠️|️♥️|♦️|♣️|♥️|❤️|[cdhsn]|nt)(?<dblRdbl>x{0,2})\s*(?<declarer>[nsew])/i
 
 const BoardSchema = new Schema({
     boardNumber: {
@@ -70,3 +71,5 @@ BoardSchema.virtual('redoubled').get(
 )
 const Board = mongoose.model('Board', BoardSchema)
 module.exports = {BoardSchema, Board}
+
+//4♠️s
