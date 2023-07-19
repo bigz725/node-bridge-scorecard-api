@@ -30,6 +30,7 @@ build:
     - 'echo "Building image: $CURRENT_TAG"'
     - docker buildx create --use
     - docker buildx build --platform linux/arm/v8,linux/amd64 --tag $CURRENT_TAG .
+    - docker push $CURRENT_TAG
 
 test:
   stage: test
