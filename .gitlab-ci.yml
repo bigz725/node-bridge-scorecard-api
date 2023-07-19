@@ -27,14 +27,9 @@ before_script:
 build:
   stage: build
   script:
-    - 'echo "Building image: $CURRENT_TAG" for amd64'
-    - docker build -t $CURRENT_TAG-amd64 --build-arg ARCH=amd64/ .
-    - echo 'Running tests'
-    - docker run $CURRENT_TAG npm test
-    - docker push $CURRENT_TAG-amd64
-    - 'echo "Building image: $CURRENT_TAG" for arm64v8'
-    - docker build -t $CURRENT_TAG-arm64v8 --build-arg ARCH=arm64v8/ .
-    - docker push $CURRENT_TAG-arm64v8
+    - 'echo "Building image: $CURRENT_TAG"'
+    - docker buildx create --use
+    - docker buildx build --platform linux/arm/v8,linux/amd64 --tag $CURRENT_TAG
 
 test:
   stage: test
