@@ -29,7 +29,7 @@ build:
   script:
     - 'echo "Building image: $CURRENT_TAG"'
     - docker buildx create --use
-    - docker buildx build --push --platform linux/arm/v8,linux/amd64 --tag $CURRENT_TAG .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag $CURRENT_TAG .
 
 test:
   stage: test
