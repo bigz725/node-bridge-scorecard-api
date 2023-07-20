@@ -38,6 +38,18 @@ test:
     - docker pull $CURRENT_TAG
     - docker run $CURRENT_TAG npm test    
 
+deploy_staging:
+  stage: deploy
+  script:
+    - 'echo "Deploying to staging"'
+  when: manual
+
+deploy_pi_kube_cluster:
+  stage: deploy
+  script:
+    - ' echo "Deploying to the Super6c Pi Cluster"'
+  when: manual  
+
 # second-job:
 #   stage: run
 #   script:
