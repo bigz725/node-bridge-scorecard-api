@@ -11,6 +11,8 @@ variables:
   CACHE_TAG: $REGISTRY/$IMAGE:cache
   RELEASE_TAG: $REGISTRY/$IMAGE:latest
 
+  BUILDKIT_INLINE_CACHE: "1"
+
 services:
 - name: docker:dind
   command: ["--tls=false"]
