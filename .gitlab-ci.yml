@@ -8,6 +8,7 @@ variables:
   IMAGE: zachistan/bridge_scorecard_api
 
   CURRENT_TAG: $REGISTRY/$IMAGE:$CI_COMMIT_REF_SLUG
+  CACHE_TAG: $REGISTRY/$IMAGE:cache
   RELEASE_TAG: $REGISTRY/$IMAGE:latest
 
 services:
@@ -16,6 +17,7 @@ services:
 
 stages:
   - build
+  - push
   - test
   - release
   - deploy
@@ -23,14 +25,30 @@ stages:
 
 before_script:
   - docker info
+  - docker context create builder-context
+  - docker buildx create --name builderx --driver docker-container --use builder-context
 
-build:
+build_amd64:
+  tags:
+    - x86
   stage: build
   script:
     - 'echo "Building image: $CURRENT_TAG"'
-    - docker buildx create --use
-    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag $CURRENT_TAG .
+    # - docker buildx create --use
+    - docker buildx build --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
 
+build_arm64:
+  tags:
+    - arm
+  stage: build
+  script:
+    - docker buildx build --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
+
+push:
+  stage: push
+  script:
+    - docker buildx build --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
+    
 test:
   stage: test
   script:
