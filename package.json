@@ -6,6 +6,7 @@
   "scripts": {
     "start": "migrate-mongo up && nodemon index.js",
     "console": "node --experimental-repl-await console.js",
+    "incrementVersion": "node generate-revision.js",
     "test": "mocha --recursive --exit --reporter dot --timeout 5000"
   },
   "keywords": [],
@@ -18,6 +19,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-winston": "^4.2.0",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.0",
     "migrate-mongo": "^10.0.0",
     "mongoose": "^6.8.4",

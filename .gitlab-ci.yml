@@ -37,19 +37,19 @@ build_amd64:
   script:
     - 'echo "Building image: $CURRENT_TAG"'
     # - docker buildx create --use
-    - docker buildx build --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
+    - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
 
 build_arm64:
   tags:
     - arm
   stage: build
   script:
-    - docker buildx build --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
+    - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
 
 push:
   stage: push
   script:
-    - docker buildx build --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
+    - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
     
 test:
   stage: test
