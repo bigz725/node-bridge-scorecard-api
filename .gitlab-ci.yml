@@ -79,9 +79,7 @@ deploy_pi_kube_cluster:
   script:
     - ' echo "Deploying to the Super6c Pi Cluster"'
     - ssh-add <(echo "$DEPLOYER_ID_ECDSA")
-    - cd infrastructure/bridge_scorecard_api
-    - kubectl delete namespace bridge_api
-    - kubectl apply -f .
+    - ssh -o StrictHostKeyChecking=no deployer@"$CLUSTER_MAIN_NODE" 'cd infrastructure/bridge_scorecard_api && git pull && kubectl delete namespace bridge_api && kubectl apply -f .'
   when: manual  
 
 # second-job:
