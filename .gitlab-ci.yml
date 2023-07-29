@@ -66,8 +66,20 @@ deploy_staging:
 
 deploy_pi_kube_cluster:
   stage: deploy
+  environment:
+    name: Staging cluster
+    url: http://bridge.zkissane.com
+
+  before_script:
+    - 'which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f ./dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no \n\n" > ~/.ssh/config'
+
   script:
     - ' echo "Deploying to the Super6c Pi Cluster"'
+    - ssh-add <(echo "$PRIVATE_KEY")
+    - ssh-o StrictHostKeyChecking=no deployer@"$CLUSTER_MAIN_NODE" 'cat /etc/issue'
   when: manual  
 
 # second-job:
