@@ -9,7 +9,6 @@ variables:
 
   CURRENT_TAG: $REGISTRY/$IMAGE:$CI_COMMIT_REF_SLUG
   CACHE_TAG: $REGISTRY/$IMAGE:cache
-  RELEASE_TAG: $REGISTRY/$IMAGE:latest
 
   BUILDKIT_INLINE_CACHE: "1"
 
@@ -29,26 +28,92 @@ before_script:
   - docker info
   - docker context create builder-context
   - docker buildx create --name builderx --driver docker-container --use builder-context
+#---TEMPLATES-----------
+.build_branch_template:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+  variables:
+    APP_VERSION_TAG: "$CI_COMMIT_REF_SLUG"
 
-build_amd64:
+.build_main_template:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  variables:
+    APP_VERSION_TAG: "$CI_COMMIT_REF_SLUG"
+
+.push_branch_template:
+  stage: push
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+  variables:
+    APP_VERSION_TAG: "$CI_COMMIT_REF_SLUG"
+    CURRENT_TAG: $REGISTRY/$IMAGE:$CI_COMMIT_REF_SLUG
+
+.push_main_template:
+  stage: push
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  variables:
+    APP_VERSION_TAG: main
+    CURRENT_TAG: $REGISTRY/$IMAGE:main
+#end TEMPLATES--------------
+  
+#----BRANCH JOBS------------
+build_amd64_branch:
   tags:
     - x86
-  stage: build
+    - amd64
+  extends: .build_branch_template
   script:
-    - 'echo "Building image: $CURRENT_TAG"'
-    # - docker buildx create --use
-    - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
+    - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using branch build"'
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
 
-build_arm64:
+build_arm64_branch:
+  tags:
+    - arm64
+  extends: .build_branch_template
+  script:
+    - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using branch build"'
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
+
+push_branch:
+  extends: .push_branch_template
+  script:
+    - 'echo "Pushing images from $CACHE_TAG to $CURRENT_TAG." for branch build'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
+#---END BRANCH JOBS
+#---MAIN JOBS ----------
+build_arm64_main:
+  extends: .build_main_template
   tags:
     - arm
   stage: build
   script:
-    - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
+    - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using main build"'
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
 
-push:
+build_amd64:
+  tags:
+    - x86
+  extends: .build_main_template  
+  stage: build
+  script:
+    - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using branch build"'
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
+
+
+
+push_main:
+  extends: .push_main_template
   stage: push
   script:
+    - 'echo "Pushing images from $CACHE_TAG to $CURRENT_TAG." for main build'
     - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
     
 test:
