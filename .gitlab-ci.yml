@@ -97,7 +97,7 @@ build_arm64_main:
     - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 . "'
     - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
 
-build_amd64:
+build_amd64_main:
   tags:
     - x86
   extends: .build_main_template  
@@ -107,15 +107,15 @@ build_amd64:
     - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 . "'
     - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
 
-
-
 push_main:
   extends: .push_main_template
   stage: push
   script:
-    - 'echo "Pushing images from $CACHE_TAG to $CURRENT_TAG." for main build'
-    - docker buildx build --build-arg tag="$CI_COMMIT_REF_SLUG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
-    
+    - 'echo "Pushing images from $CACHE_TAG to $CURRENT_TAG" for main build'
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 ."'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
+
+#---END MAIN JOBS    
 test:
   stage: test
   script:
