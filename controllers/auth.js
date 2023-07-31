@@ -18,7 +18,8 @@ exports.signup = async (req, res) => {
 
   try {
     if (req.body.roles != null) {
-      var roles = await Role.find({name: {$in: req.body.roles}}).orFail();
+      var filteredRoles = req.body.roles.filter(role => role != "admin")
+      var roles = await Role.find({name: {$in: filteredRoles}}).orFail();
       user.roles = roles.map(role => role._id);
     }
     else {
