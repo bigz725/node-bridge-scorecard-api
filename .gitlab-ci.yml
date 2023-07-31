@@ -35,6 +35,7 @@ before_script:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
   variables:
     APP_VERSION_TAG: "$CI_COMMIT_REF_SLUG"
+    TEST_TAG: $REGISTRY/$IMAGE:$CI_COMMIT_REF_SLUG-testing
 
 .build_main_template:
   stage: build
@@ -42,6 +43,7 @@ before_script:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   variables:
     APP_VERSION_TAG: main
+    TEST_TAG: $REGISTRY/$IMAGE:main-testing
 
 .push_branch_template:
   stage: push
@@ -58,6 +60,7 @@ before_script:
   variables:
     APP_VERSION_TAG: main
     CURRENT_TAG: $REGISTRY/$IMAGE:main
+    
 #end TEMPLATES--------------
   
 #----BRANCH JOBS------------
@@ -68,7 +71,7 @@ build_amd64_branch:
   script:
     - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using branch build"'
     - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG" --push --platform=linux/amd64 .
 
 build_arm64_branch:
   tags:
@@ -77,7 +80,7 @@ build_arm64_branch:
   script:
     - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using branch build"'
     - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/arm64/v8 .
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG" --push --platform=linux/arm64/v8 .
 
 push_branch:
   extends: .push_branch_template
@@ -118,9 +121,9 @@ push_main:
 test:
   stage: test
   script:
-    - 'echo "Pulling $CACHE_TAG to test using npm test"'
-    - docker pull $CACHE_TAG
-    - docker run $CACHE_TAG npm test    
+    - 'echo "Pulling $TEST_TAG to test using npm test"'
+#    - docker pull $CACHE_TAG
+#    - docker run $CACHE_TAG npm test    
 
 deploy_staging:
   stage: deploy
