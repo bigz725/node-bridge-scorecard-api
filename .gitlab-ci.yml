@@ -18,8 +18,8 @@ services:
 
 stages:
   - build
-  - push
   - test
+  - push
   - release
   - deploy
 
@@ -41,7 +41,7 @@ before_script:
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   variables:
-    APP_VERSION_TAG: "$CI_COMMIT_REF_SLUG"
+    APP_VERSION_TAG: main
 
 .push_branch_template:
   stage: push
@@ -63,7 +63,6 @@ before_script:
 #----BRANCH JOBS------------
 build_amd64_branch:
   tags:
-    - x86
     - amd64
   extends: .build_branch_template
   script:
@@ -90,7 +89,7 @@ push_branch:
 build_arm64_main:
   extends: .build_main_template
   tags:
-    - arm
+    - arm64
   stage: build
   script:
     - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using main build"'
@@ -99,11 +98,11 @@ build_arm64_main:
 
 build_amd64_main:
   tags:
-    - x86
+    - amd64
   extends: .build_main_template  
   stage: build
   script:
-    - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using branch build"'
+    - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using main build"'
     - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 . "'
     - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --push --platform=linux/amd64 .
 
@@ -119,12 +118,15 @@ push_main:
 test:
   stage: test
   script:
-    - 'echo "Pulling $CURRENT_TAG to test using npm test"'
-    - docker pull $CURRENT_TAG
-    - docker run $CURRENT_TAG npm test    
+    - 'echo "Pulling $CACHE_TAG to test using npm test"'
+    - docker pull $CACHE_TAG
+    - docker run $CACHE_TAG npm test    
 
 deploy_staging:
   stage: deploy
+  environment:
+    name: Staging VM
+    url: http://bridge-staging.zkissane.com
   script:
     - 'echo "Deploying to staging"'
   when: manual
@@ -146,10 +148,3 @@ deploy_pi_kube_cluster:
     - ssh-add <(echo "$DEPLOYER_ID_ECDSA")
     - ssh -o StrictHostKeyChecking=no deployer@"$CLUSTER_MAIN_NODE" 'cd infrastructure/bridge_scorecard_api; ./deploy.sh'
   when: manual  
-
-# second-job:
-#   stage: run
-#   script:
-#     - docker create $IMAGE -it --name $CONTAINER
-#     - docker exec -it npm test
-#     - docker stop $CONTAINER
