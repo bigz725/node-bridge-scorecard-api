@@ -71,8 +71,9 @@ build_amd64_branch:
   extends: .build_branch_template
   script:
     - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using branch build"'
-    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_AMD_64" --push --platform=linux/amd64 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_AMD_64" --push --platform=linux/amd64 .
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_AMD_64" --push --platform=linux/amd64 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_AMD_64" --push --platform=linux/amd64 .
+    - echo "TEST_TAG_AMD_64=$TEST_TAG_AMD_64" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env  
@@ -83,8 +84,9 @@ build_arm64_branch:
   extends: .build_branch_template
   script:
     - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using branch build"'
-    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 .
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 .
+    - echo "TEST_TAG_ARM_64=$TEST_TAG_ARM_64" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env   
@@ -103,8 +105,9 @@ build_arm64_main:
   stage: build
   script:
     - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using main build"'
-    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 .
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_ARM_64" --push --platform=linux/arm64/v8 .
+    - echo "TEST_TAG_ARM_64=$TEST_TAG_ARM_64" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env 
@@ -116,8 +119,9 @@ build_amd64_main:
   stage: build
   script:
     - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using main build"'
-    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_AMD_64" --push --platform=linux/amd64 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "TEST_TAG_AMD_64" --push --platform=linux/amd64 .
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_AMD_64" --push --platform=linux/amd64 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG_AMD_64" --push --platform=linux/amd64 .
+    - echo "TEST_TAG_AMD_64=$TEST_TAG_AMD_64" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env 
@@ -134,6 +138,9 @@ push_main:
 test_amd64:
   tags:
     - amd64
+  needs:
+    - job: build_amd64_main
+      artifacts: true    
   stage: test
   script:
     - 'echo "Pulling $TEST_TAG_AMD_64 to test using npm test"'
@@ -143,6 +150,9 @@ test_amd64:
 test_arm64:
   tags:
     - arm64
+  needs:
+    - job: build_arm64_main
+      artifacts: true   
   stage: test
   script:
     - 'echo "Pulling $TEST_TAG_ARM_64 to test using npm test"'
