@@ -72,8 +72,11 @@ build_amd64_branch:
   extends: .build_branch_template
   script:
     - 'echo "Building cache image: $CACHE_TAG for amd64 architecture using branch build"'
-    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG" --push --platform=linux/amd64 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG" --push --platform=linux/amd64 .
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG:amd64" --push --platform=linux/amd64 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG:amd64" --push --platform=linux/amd64 .
+  artifacts:
+    reports:
+      dotenv: variables.env  
 
 build_arm64_branch:
   tags:
@@ -81,8 +84,11 @@ build_arm64_branch:
   extends: .build_branch_template
   script:
     - 'echo "Building cache image: $CACHE_TAG for arm64 architecture using branch build"'
-    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG" --push --platform=linux/arm64/v8 . "'
-    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG" --push --platform=linux/arm64/v8 .
+    - 'echo "with command: docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG:arm64" --push --platform=linux/arm64/v8 . "'
+    - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-to=type=registry,ref="$CACHE_TAG" --cache-from "$CACHE_TAG" --tag "$CACHE_TAG" --tag "$TEST_TAG:arm64" --push --platform=linux/arm64/v8 .
+  artifacts:
+    reports:
+      dotenv: variables.env   
 
 push_branch:
   extends: .push_branch_template
@@ -120,13 +126,24 @@ push_main:
     - docker buildx build --build-arg tag="$APP_VERSION_TAG" --cache-from "$CACHE_TAG" --tag "$CURRENT_TAG" --push --platform=linux/arm64/v8,linux/amd64 .
 
 #---END MAIN JOBS    
-test:
+test_amd64:
+  tags:
+    - amd64
   stage: test
   script:
     - 'echo "Pulling $TEST_TAG to test using npm test"'
-#    - docker pull $CACHE_TAG
-#    - docker run $CACHE_TAG npm test    
+    - docker pull $TEST_TAG
+    - docker run $TEST_TAG npm test    
 
+test_arm64:
+  tags:
+    - arm64
+  stage: test
+  script:
+    - 'echo "Pulling $TEST_TAG to test using npm test"'
+    - docker pull $TEST_TAG
+    - docker run $TEST_TAG npm test
+  
 deploy_staging:
   stage: deploy
   environment:
