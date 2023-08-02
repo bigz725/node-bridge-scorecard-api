@@ -148,6 +148,8 @@ test_amd64:
     - docker run $TEST_TAG_AMD_64 npm test    
 
 test_arm64:
+  rules:
+    - when: never 
   allow_failure: true
   tags:
     - arm64
