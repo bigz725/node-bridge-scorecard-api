@@ -7,3 +7,4 @@ Dockerfile
 *.log
 logs
 exampleFiles
+config/secret.*
