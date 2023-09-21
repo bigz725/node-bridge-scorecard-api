@@ -133,5 +133,6 @@ deploy_pi_kube_cluster:
   script:
     - ' echo "Deploying to the Super6c Pi Cluster"'
     - ssh-add <(echo "$DEPLOYER_ID_ECDSA")
-    - ssh -o StrictHostKeyChecking=no deployer@"$CLUSTER_MAIN_NODE" 'KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm upgrade --set image.tag=$CI_COMMIT_REF_SLUG bridge-api chartmuseum/bridge-scorecard-api'
+    # Make sure to update deployer's list of chartmusem's charts
+    - ssh -o StrictHostKeyChecking=no deployer@"$CLUSTER_MAIN_NODE" 'helm update repo chartmuseum && KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm upgrade --set image.tag=$CI_COMMIT_REF_SLUG bridge-api chartmuseum/bridge-scorecard-api'
   when: manual  
