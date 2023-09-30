@@ -34,7 +34,7 @@ describe('Board', function() {
             })
 
             it('should delete', async function() {
-                await board.delete()
+                await Board.deleteOne({ _id: board.id })
                 count = await Board.count()
                 expect(count).to.eq(0)
             })
