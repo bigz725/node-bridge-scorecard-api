@@ -17,15 +17,15 @@ Role=db.role
 
 db.ROLES = ["user", "admin"]
 
-db.initial = function () {
-    Role.estimatedDocumentCount((err, count) => {
-        if (!err && count === 0) {
-            new Role({name: 'user'}).save(err => { if(err) logger.error(err)})
-            logger.info("added 'user' to roles collection")
-            new Role({name: 'admin'}).save(err => { if(err) logger.error(err)})
-            logger.info("added 'admin' to roles collection")
-        }
-    })
+db.initial = async function () {
+    count = await Role.estimatedDocumentCount();
+    if (count === 0) {
+        logger.info("No roles found, adding 'user' and 'admin' to roles collection")
+        new Role({name: 'user'}).save(err => { if(err) logger.error(err)})
+        logger.info("added 'user' to roles collection")
+        new Role({name: 'admin'}).save(err => { if(err) logger.error(err)})
+        logger.info("added 'admin' to roles collection")
+    }
 }
 
 module.exports = db
